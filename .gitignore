@@ -1,0 +1,5 @@
+__pycache__
+cratedigger.egg-info
+*.pyc
+
+.vscode
