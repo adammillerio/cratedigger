@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 import os
 import sys
+import logging
 import click
 from typing import List, Any
 from cratedigger.util.context import Context
+
+# Logging
+logger = logging.getLogger(__name__)
 
 # Load env vars prefixed with CRATEDIGGER
 CONTEXT_SETTINGS = dict(auto_envvar_prefix='CRATEDIGGER')
@@ -47,6 +51,19 @@ class CrateDigger(click.MultiCommand):
     return mod.cli
 
 @click.command(cls=CrateDigger, context_settings=CONTEXT_SETTINGS)
+@click.option('--verbose', is_flag=True, help='Enable verbose output')
+@click.option('--dry-run', is_flag=True, help='Print all actions to console without applying')
 @pass_context
-def cli(ctx: Context) -> None:
-  pass
+def cli(ctx: Context, verbose: bool, dry_run: bool) -> None:
+  # Set context values
+  ctx.verbose = verbose
+  ctx.dry_run = dry_run
+
+  # Set log level
+  if verbose:
+    level = logging.DEBUG
+  else:
+    level = logging.INFO
+  
+  # Initialize logger
+  logging.basicConfig(level=level)

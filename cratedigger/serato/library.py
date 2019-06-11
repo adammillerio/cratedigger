@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from logging import getLogger
 from glob import glob
 from re import match
 from json import dumps
@@ -7,6 +8,9 @@ from typing import List
 from anytree import PreOrderIter, RenderTree
 from cratedigger.util import to_dict
 from cratedigger.serato.crate import SeratoCrate
+
+# Logging
+logger = getLogger(__name__)
 
 class SeratoLibrary(object):
   # "Root" crate of the crates tree, all crates are grouped under this
@@ -20,10 +24,20 @@ class SeratoLibrary(object):
     # Return serialized JSON representation
     return dumps(self.__dict__, indent=2, sort_keys=True, default=to_dict)
   
+  def __len__(self) -> int:
+    # Return the amount of descendants in the crates tree
+    return len(self.crates.descendants)
+  
   def render(self) -> str:
+    # String for rendered representation
+    render = ''
+
     # Render a tree of all crates
     for pre, _, node in RenderTree(self.crates):
-      print('%s%s' % (pre, node))
+      render += '%s%s\n' % (pre, node)
+    
+    # Return rendered string
+    return render
   
   def load(self, path: str) -> None:
     # Store the path
@@ -75,6 +89,11 @@ class SeratoLibrary(object):
         self.load_crates(subcrates, prefix, child)
   
   def write(self) -> None:
+    if not os.path.exists(self.crates_path):
+      # Create the crates path if it doesn't exist
+      logger.info('Creating crates directory %s' % self.crates_path )
+      os.makedirs(self.crates_path)
+
     for crate in PreOrderIter(self.crates):
       # Traverse the tree and write all crates
       crate.write_crate(self.crates_path)

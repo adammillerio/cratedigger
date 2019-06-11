@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+from logging import getLogger
 from os.path import basename, splitext, join
 from json import dumps
 from typing import Iterable
 from anytree import NodeMixin
 from cratedigger.util.io import InputStream, OutputStream
+
+# Logging
+logger = getLogger(__name__)
 
 class SeratoCrate(NodeMixin):
   # Delimiter for crates. The Serato crates directory is "flat" and Serato
@@ -42,6 +46,8 @@ class SeratoCrate(NodeMixin):
     return dumps(self.__dict__, indent=2, sort_keys=True)
   
   def load_crate(self, path: str) -> None:
+    logger.debug('Loading Serato crate %s' % path)
+
     # Set crate path
     self.crate_name = splitext(basename(path))[0]
 
@@ -159,8 +165,12 @@ class SeratoCrate(NodeMixin):
     crate_file.close()
   
   def write_crate(self, path: str) -> None:
+    # Crate path
+    crate_path = join(path, '%s.crate' % self.crate_name)
+    logger.debug('Writing Serato crate %s' % crate_path)
+
     # Open crate file as binary BufferedReader
-    crate_file = open(join(path, '%s.crate' % self.crate_name), 'wb')
+    crate_file = open(crate_path, 'wb')
 
     # Create InputStream helper from BufferedReader
     stream = OutputStream(crate_file)
