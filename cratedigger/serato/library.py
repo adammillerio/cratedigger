@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 from logging import getLogger
 from glob import glob
 from re import match
@@ -114,16 +115,21 @@ class SeratoLibrary(object):
       return
 
     # Match a windows volume type if the path starts with *:\\
-    volume_regex = match(r'(^[a-zA-Z])(:\\\\)', path) 
+    volume_regex = match(r'(^[a-zA-Z])(:\\)', path)
     if volume_regex:
       # Set volume type to windows and get volume name
       # e.g. c for C:\\serato
       self.volume_type = 'windows'
-      self.volume = volume_regex.groups()[0].lower()
-      self.volume_path = '%s:\\\\' % self.volume
+      self.volume = volume_regex.groups()[0].upper()
+      self.volume_path = '%s:\\' % self.volume
 
-      # Set crates path to volume:\\_Serato_\\Subcrates
-      self.crates_path = os.path.join(self.volume_path, '_Serato_', 'Subcrates')
+      if self.volume == 'C':
+        # Set crates path to C:\Users\user\Music\_Serato_\Subcrates if C drive
+        # This is where the crates for the C drive always live on Windows
+        self.crates_path = os.path.join(Path.home(), 'Music', '_Serato_', 'Subcrates')
+      else:
+        # Set crates path to volume:\_Serato_\Subcrates otherwise
+        self.crates_path = os.path.join(self.volume_path, '_Serato_', 'Subcrates')
       
       return
     

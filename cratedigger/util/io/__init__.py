@@ -1,7 +1,6 @@
 
 #!/usr/bin/env python3
 from _io import BufferedReader, BufferedWriter
-from struct import unpack
 
 class InputStream(object):
   def __init__(self, reader: BufferedReader) -> None:

@@ -34,12 +34,13 @@ class MediaCrate(SeratoCrate):
   def load_crate(self, path: str, volume_path: str) -> None:
     logger.debug('Loading Media crate from %s' % path)
 
+    # Remove the volume from the path, as it is relative in Serato
     self.crate_path = path[path.startswith(volume_path) and len(volume_path):]
     self.crate_name = '%s%s%s' % (
       MediaCrate.root_crate, SeratoCrate.delimiter, 
-      self.crate_path.replace('/', SeratoCrate.delimiter)
+      self.crate_path.replace('/', SeratoCrate.delimiter).replace('\\', SeratoCrate.delimiter)
     )
 
     for file in os.listdir(path):
       if file.endswith(SUPPORTED_FILE_TYPES):
-        self.tracks.append(os.path.join(self.crate_path, file))
+        self.tracks.append(os.path.join(self.crate_path, file).replace('\\', '/'))
