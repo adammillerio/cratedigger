@@ -1,34 +1,32 @@
 #!/usr/bin/env python3
-from os.path import basename, splitext
+from os.path import basename, splitext, join
 from json import dumps
+from typing import Iterable
 from anytree import NodeMixin
 from cratedigger.util.io import InputStream, OutputStream
 
 class SeratoCrate(NodeMixin):
-  def __init__(self, path: str = None, parent=None, children=None) -> None:
+  # Delimiter for crates. The Serato crates directory is "flat" and Serato
+  # uses the %% delimiter to determine when a crate is a "subcrate" of another
+  delimiter = '%%'
+
+  def __init__(self, parent = None, children = None) -> None:
     # "Version" of the crate, presumably something Serato determines
-    self.version = ''
+    self.version = '81.0'
     
     # Metadata to sort crate by, such as "song" for song name
-    self.sort = ''
+    self.sort = 'song'
 
     # "Sort Rev"
     # TODO: Determine what this actually does and document it
-    self.sort_rev = 0
+    self.sort_rev = 256
     
     # All columns within the crate
-    self.columns = []
+    self.columns = ['song', 'artist', 'album', 'length']
 
     # All tracks within the crate
     self.tracks = []
 
-    if path == None:
-      # If no path provided, set to blank and continue
-      self.crate_path = ''
-    else:
-      # Otherwise, load the crate in
-      self.load_crate(path)
-    
     # anytree: Set parent and child nodes
     self.parent = parent
     if children:
@@ -36,7 +34,8 @@ class SeratoCrate(NodeMixin):
   
   def __str__(self) -> str:
     # Return only the name of the crate without the extension
-    return splitext(basename(self.crate_path))[0]
+    # and replace the delimiter with /
+    return self.crate_name.replace(SeratoCrate.delimiter, '/')
   
   def to_json(self) -> str:
     # Return JSON serialized version of the crate
@@ -44,7 +43,7 @@ class SeratoCrate(NodeMixin):
   
   def load_crate(self, path: str) -> None:
     # Set crate path
-    self.crate_path = path
+    self.crate_name = splitext(basename(path))[0]
 
     # Open crate file as binary BufferedReader
     crate_file = open(path, 'rb')
@@ -159,17 +158,9 @@ class SeratoCrate(NodeMixin):
 
     crate_file.close()
   
-  def write_crate(self, path: str = None) -> None:
-    if path == None:
-      # If no path provided but the crate has one set, write there
-      if self.crate_path != '':
-        path = self.crate_path
-      else:
-        # Otherwise, we have nowhere to write, so just exit
-        return
-
+  def write_crate(self, path: str) -> None:
     # Open crate file as binary BufferedReader
-    crate_file = open(path, 'wb')
+    crate_file = open(join(path, '%s.crate' % self.crate_name), 'wb')
 
     # Create InputStream helper from BufferedReader
     stream = OutputStream(crate_file)
