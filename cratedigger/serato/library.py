@@ -113,6 +113,20 @@ class SeratoLibrary(object):
       self.crates_path = os.path.join(self.volume_path, '_Serato_', 'Subcrates')      
 
       return
+    
+    # Also match a mac volume type if the path starts with /Users/*
+    volume_regex = match(r'(^\/Users\/)([^\/]+)', path)
+    if volume_regex:
+      # Set volume type to mac and set the volume path to root
+      self.volume_type = 'mac'
+      self.volume = ''
+      self.volume_path = '/'
+
+      # Set crates path to ~/Music/_Serato_/Subcrates
+      # This is where the crates on the root drive always live on Mac
+      self.crates_path = os.path.join(Path.home(), 'Music', '_Serato_', 'Subcrates')      
+
+      return
 
     # Match a windows volume type if the path starts with *:\\
     volume_regex = match(r'(^[a-zA-Z])(:\\)', path)
