@@ -119,7 +119,7 @@ class SeratoLibrary(object):
     if volume_regex:
       # Set volume type to mac and set the volume path to root
       self.volume_type = 'mac'
-      self.volume = ''
+      self.volume = 'root'
       self.volume_path = '/'
 
       # Set crates path to ~/Music/_Serato_/Subcrates
