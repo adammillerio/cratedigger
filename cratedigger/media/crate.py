@@ -2,6 +2,7 @@
 import os
 from logging import getLogger
 from json import dumps
+from typing import Tuple, TypeVar, Type
 from os.path import splitext, basename
 from anytree import NodeMixin
 from cratedigger.serato.crate import SeratoCrate
@@ -24,11 +25,48 @@ SUPPORTED_FILE_TYPES = (
   '.aac'
 )
 
+# Type var
+MC = TypeVar('MC', bound='MediaCrate')
+
 class MediaCrate(SeratoCrate):
-  def __init__(self, parent = None, children = None) -> None:
+  """A media folder represented as a Serato Crate.
+
+  This class is intended to read a given media folder and represent it as a
+  Serato Crate.
+
+  """
+
+  def __init__(self, parent: Type[MC] = None, children: Tuple[Type[MC]] = None) -> None:
+    """Initialize a Media Crate
+
+    This method invokes the SeratoCrate constructor in order to set the provided
+    parent node and children.
+
+    Args:
+      parent (:obj:`MediaCrate`, optional): Parent crate (if subcrate)
+      children (:obj:`tuple` of obj:`MediaCrate`, optional): Child crates
+
+    """
+
     super().__init__(parent, children)
 
   def load_crate(self, path: str, volume: str, volume_path: str, prefix: str = None) -> None:
+    """Load a given media folder path as a Serato crate.
+
+    This method lists a given directory, and adds all compatible files to the
+    Serato crate as tracks.    
+
+    Args:
+      path (str): Path to load tracks from
+      volume (str): Volume that the tracks are being loaded from, used in the
+                    crate name
+      volume_path (str): Root path on the volume that tracks are being loaded,
+                         used when converting track paths to the Serato
+                         "relative" format
+      prefix (str, optional): Prefix to append to the crate name
+
+    """
+
     logger.debug('Loading Media crate from %s' % path)
 
     # Add prefix to crate name if provided

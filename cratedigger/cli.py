@@ -20,7 +20,26 @@ pass_context = click.make_pass_decorator(Context, ensure=True)
 command_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), 'commands'))
 
 class CrateDigger(click.MultiCommand):
+  """CrateDigger CLI class.
+  
+  This is the main entrypoint class for the CrateDigger CLI.
+
+  """
+
   def list_commands(self, ctx: Context) -> List[str]:
+    """Retrieve a list of available CLI commands.
+
+    This retrieves the base name of all files in the cratedigger/commands folder
+    in order to determine a list of available commands.
+
+    Args:
+      ctx (obj:`Context`): Click CLI context
+    
+    Returns:
+      commands (obj:`list` of str): List of available commands
+
+    """
+
     # Commands array
     commands = []
 
@@ -35,6 +54,22 @@ class CrateDigger(click.MultiCommand):
     return commands
 
   def get_command(self, ctx: Context, name: str) -> Any:
+    """Retrieve a Click CLI command.
+
+    This method imports a given CLI command and returns it.
+
+    Args:
+      ctx (obj:`Context`): Click CLI context
+      name (str): Name of the command to import
+    
+    Returns:
+      command: The imported command
+    
+    Raises:
+      ImportError: If the given command cannot be imported
+
+    """
+
     # Attempt to load the command
     try:
       # Python 2 compatability
@@ -55,6 +90,17 @@ class CrateDigger(click.MultiCommand):
 @click.option('--dry-run', is_flag=True, help='Print all actions to console without applying')
 @pass_context
 def cli(ctx: Context, verbose: bool, dry_run: bool) -> None:
+  """Run the CrateDigger CLI.
+
+  This is the entrypoint for the CrateDigger CLI, and initializes all
+  program-wide context values.
+
+  Args:
+    verbose (bool): Verbose output mode
+    dry_run (bool): Print actions to the console without performing them
+
+  """
+
   # Set context values
   ctx.verbose = verbose
   ctx.dry_run = dry_run

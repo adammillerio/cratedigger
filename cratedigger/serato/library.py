@@ -14,22 +14,81 @@ from cratedigger.serato.crate import SeratoCrate
 logger = getLogger(__name__)
 
 class SeratoLibrary(object):
+  """A library of Serato Crates.
+
+  This represents a library within Serato. This is composed of a volume and
+  associated metadata, as well as a list of crates present on that volume.
+
+  Attributes:
+    path (str): Path to the loaded Serato Library
+    volume_type (str): Type of the volume, either mac or windows
+    volume (str): Name of the volume. On windows, this is a drive letter. On a
+                  mac, this is either root if on the root drive, or an arbitrary
+                  volume name if on a volume.
+    volume_path (str): Path to the root of the volume
+    crates_path (str): Path to the Subcrates folder on the volume
+    crates (obj:`SeratoCrate`): Tree of all crates in the Serato Library
+    root_crate (obj:`SeratoCrate`): Root crate of tree, all loaded Serato
+                                    libraries are grouped under this
+
+  """
+  
   # "Root" crate of the crates tree, all crates are grouped under this
   root_crate = SeratoCrate(parent=None)
   root_crate.crate_name = 'Root'
 
   def __init__(self) -> None:
+    """Initialize a Serato Library
+
+    This initializes the Serato Library and it's attributes to default values.
+
+    """
+
+    self.path = ''
+    self.volume_type = ''
+    self.volume = ''
+    self.volume_path = ''
+    self.crates_path = ''
+
     pass
   
   def __str__(self) -> str:
+    """Return a string representation of the Serato Library.
+
+    This returns the Serato Library object serialized as JSON.
+
+    Returns:
+      library_str (str): String representation of the Serato Library
+
+    """
+
     # Return serialized JSON representation
     return dumps(self.__dict__, indent=2, sort_keys=True, default=to_dict)
   
   def __len__(self) -> int:
+    """Return the length of a Serato Library
+
+    This returns the count of all decendant crates in the Serato Library's tree.
+
+    Returns:
+      length (int): Length of the Serato Library
+
+    """
+
     # Return the amount of descendants in the crates tree
     return len(self.crates.descendants)
   
   def render(self) -> str:
+    """Render the Serato Library as an ASCII tree.
+    
+    This renders all crates within the Serato Library and returns this
+    representation in string format.
+
+    Returns:
+      tree (str): String representation of the Serato Library tree
+
+    """
+
     # String for rendered representation
     render = ''
 
@@ -41,6 +100,20 @@ class SeratoLibrary(object):
     return render
   
   def load(self, path: str) -> None:
+    """Load a Serato Library from a given path
+
+    This method loads all .crate files in a given path's Subcrates folder
+    as SeratoCrate objects and assembles them in a tree structure based on 
+    their delimiters.
+
+    Args:
+      path (str): Path to the _Serato_ folder
+
+    Raises:
+      ValueError: If no _Serato_ folder is present in the given path
+
+    """
+
     # Store the path
     self.path = path
     
@@ -74,6 +147,19 @@ class SeratoLibrary(object):
         self.load_crates(subcrates, prefix, child)
   
   def load_crates(self, crates: List[str], prefix: str, parent: SeratoCrate) -> None:
+    """Recursively load a set of Serato .crate files.
+
+    This method takes a list of crates, and loads them as children of a given
+    SeratoCrate. If any of these crates have their own subcrates, this method
+    is recursively called until the end of the tree is reached.
+
+    Args:
+      crates (obj:`list` of obj:`str`): List of paths to .crate files
+      prefix (str): The prefix to use when attempting to locate subcrates
+      parent (obj:`SeratoCrate`): Parent crate of the subcrates to be loaded
+
+    """
+
     for crate in crates:
       # Create child node from the crate, using the provided parent
       child = SeratoCrate(parent=parent)
@@ -90,6 +176,13 @@ class SeratoLibrary(object):
         self.load_crates(subcrates, prefix, child)
   
   def write(self) -> None:
+    """Write all crates in a Serato Library as .crate files.
+
+    This method traverses the Serato Library and writes all Serato Crates as
+    .crate files in the crates_path.
+
+    """
+
     if not os.path.exists(self.crates_path):
       # Create the crates path if it doesn't exist
       logger.info('Creating crates directory %s' % self.crates_path )
@@ -100,6 +193,19 @@ class SeratoLibrary(object):
       crate.write_crate(self.crates_path)
   
   def split_volume(self, path: str) -> None:
+    """Determine volume metadata of the library based on a given path.
+
+    This method takes a given path and determines the associated volume
+    metadata.
+
+    Args:
+      path (str): Path to determine volume metadata from
+
+    Raises:
+      ValueError: If the volume type of the path cannot be determined
+
+    """
+
     # Match a mac volume type if the path starts with /Volumes/*
     volume_regex = match(r'(^\/Volumes\/)([^\/]+)', path)
     if volume_regex:

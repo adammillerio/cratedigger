@@ -2,19 +2,52 @@
 from logging import getLogger
 from os.path import basename, splitext, join
 from json import dumps
-from typing import Iterable
+from typing import Iterable, Tuple, TypeVar, Type
 from anytree import NodeMixin
 from cratedigger.util.io import InputStream, OutputStream
 
 # Logging
 logger = getLogger(__name__)
 
+# Type var
+SC = TypeVar('SC', bound='SeratoCrate')
+
 class SeratoCrate(NodeMixin):
+  """A crate within the Serato program.
+
+  This class is intended to represent the contents of a Serato crate. The
+  attributes roughly follow the values found within a crate file itself.
+
+  Attributes:
+    version (str): Version of the crate, arbitrarily determined by Serato
+    sort (str): Metadata to sort crate by, such as "song" for song name
+    sort_rev (int): "Sort Rev", unknown use
+    columns (:obj:`list` of :obj:`str`): Metadata columns within the crate
+    tracks (:obj:`list` of :obj:`str`): Tracks within the crate
+    crate_name (str): Name of the crate when published as a .crate file
+    parent (:obj:`SeratoCrate`): Parent crate (if subcrate)
+    children (:obj:`tuple` of obj:`SeratoCrate`): Child crates
+    delimiter (str): Delimiter to use when creating the name of the .crate file
+
+  """
+
   # Delimiter for crates. The Serato crates directory is "flat" and Serato
   # uses the %% delimiter to determine when a crate is a "subcrate" of another
   delimiter = '%%'
 
-  def __init__(self, parent = None, children = None) -> None:
+  def __init__(self, parent: Type[SC] = None, children: Tuple[Type[SC]] = None) -> None:
+    """SeratoCrate initialization method.
+
+    This initializes a SeratoCrate to the default values found in crates created
+    by Serato. In addition, it will optionally link parent and child nodes in
+    the tree.
+
+    Args:
+      parent (:obj:`SeratoCrate`, optional): Parent crate (if subcrate)
+      children (:obj:`tuple` of obj:`SeratoCrate`, optional): Child crates
+
+    """
+
     # "Version" of the crate, presumably something Serato determines
     self.version = '81.0'
     
@@ -31,21 +64,57 @@ class SeratoCrate(NodeMixin):
     # All tracks within the crate
     self.tracks = []
 
+    # Name of the crate
+    self.crate_name = ''
+
     # anytree: Set parent and child nodes
     self.parent = parent
     if children:
       self.children = children
   
   def __str__(self) -> str:
+    """Return a string representation of the Serato Crate
+
+    This returns the name of the Serato Crate, with the delimiter replaced by
+    forward slashes.
+
+    Returns:
+      crate_str (str): String representation of the Serato Crate 
+
+    """
+
     # Return only the name of the crate without the extension
     # and replace the delimiter with /
     return self.crate_name.replace(SeratoCrate.delimiter, '/')
   
   def to_json(self) -> str:
+    """Return a JSON representation of the Serato Crate
+
+    This returns the Serato Crate with it's attributes serialized to JSON.
+
+    Returns:
+      json_str (str): JSON representation of the Serato Crate as a string
+
+    """
+
     # Return JSON serialized version of the crate
     return dumps(self.__dict__, indent=2, sort_keys=True)
   
   def load_crate(self, path: str) -> None:
+    """Load a Serato Crate from a .crate file
+
+    This method takes a path to a .crate file and loads it into a SeratoCrate
+    object. As .crate files use an undocumented binary format, this process is
+    documented extensively inline.
+
+    Args:
+      path (str): Path to the .crate file
+
+    Raises:
+      ValueError: If an unexpected value is encountered while loading the crate.
+
+    """
+
     logger.debug('Loading Serato crate %s' % path)
 
     # Set crate path
@@ -165,6 +234,17 @@ class SeratoCrate(NodeMixin):
     crate_file.close()
   
   def write_crate(self, path: str) -> None:
+    """Write a SeratoCrate to a .crate file.
+
+    This method takes a path to a .crate file and writes the SeratoCrate object
+    to it. As .crate files use an undocumented binary format, this process is
+    documented extensively inline.
+
+    Args:
+      path (str): Path to the .crate file
+
+    """
+
     # Crate path
     crate_path = join(path, '%s.crate' % self.crate_name)
     logger.debug('Writing Serato crate %s' % crate_path)

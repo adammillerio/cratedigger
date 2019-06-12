@@ -12,6 +12,18 @@ logger = logging.getLogger(__name__)
 @click.option('--serato-dir', type=click.Path(exists=True, file_okay=False, resolve_path=False), help='Folder containing _Serato_ directory, defaults to drive/volume that music library is on')
 @pass_context
 def cli(ctx: Context, library_dir: str, serato_dir: str) -> None:
+  """Sync a given Media Library with a Serato Library
+
+  This command takes a library directory and loads all media crates within it.
+  It then writes the media crates to the Serato subcrates directory as .crate
+  files.
+
+  Args:
+    library_dir (str): Path to the library to load media crates from
+    serato_dir (str, optional): Optional override path for the Serato library
+
+  """
+
   logger.info('Loading media library from %s' % library_dir)
 
   # Read media library
