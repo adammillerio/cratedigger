@@ -2,8 +2,7 @@
 import logging
 import click
 from cratedigger.media.library import MediaLibrary
-from cratedigger.util.context import Context
-from cratedigger.cli import pass_context
+from cratedigger.cli import Context, pass_context
 
 logger = logging.getLogger(__name__)
 

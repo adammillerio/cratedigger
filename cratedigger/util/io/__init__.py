@@ -1,6 +1,5 @@
-
 #!/usr/bin/env python3
-from _io import BufferedReader, BufferedWriter
+from io import BufferedReader, BufferedWriter
 
 class InputStream(object):
   """Utility class for interacting with a binary file.
