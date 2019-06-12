@@ -4,7 +4,6 @@ from logging import getLogger
 from json import dumps
 from os.path import splitext, basename
 from anytree import NodeMixin
-from cratedigger.media.library import MediaLibrary
 from cratedigger.serato.crate import SeratoCrate
 
 # Logging
@@ -29,8 +28,14 @@ class MediaCrate(SeratoCrate):
   def __init__(self, parent = None, children = None) -> None:
     super().__init__(parent, children)
 
-  def load_crate(self, path: str, volume: str, volume_path: str) -> None:
+  def load_crate(self, path: str, volume: str, volume_path: str, prefix: str = None) -> None:
     logger.debug('Loading Media crate from %s' % path)
+
+    # Add prefix to crate name if provided
+    if prefix is not None:
+      prefix = prefix + SeratoCrate.delimiter
+    else:
+      prefix = ''
 
     # Remove the volume from the path, as it is relative in Serato
     self.crate_path = path[path.startswith(volume_path) and len(volume_path):]
@@ -42,9 +47,8 @@ class MediaCrate(SeratoCrate):
     # Example
     # Path: C:\Music\8mm\8mm - Opener EP
     # Name: Media%%C%%Music%%8mm%%8mm - Opener EP
-    self.crate_name = '%s%s%s%s%s' % (
-      MediaLibrary.root_crate.crate_name, SeratoCrate.delimiter,
-      volume, SeratoCrate.delimiter,
+    self.crate_name = '%s%s%s%s' % (
+      prefix, volume, SeratoCrate.delimiter,
       self.crate_path.replace('/', SeratoCrate.delimiter).replace('\\', SeratoCrate.delimiter)
     )
 

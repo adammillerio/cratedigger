@@ -28,7 +28,7 @@ class MediaLibrary(SeratoLibrary):
   def load_crates(self, path: str, parent: MediaCrate) -> None:
     # Create new subcrate and load it
     child = MediaCrate(parent=parent)
-    child.load_crate(path, self.volume, self.volume_path)
+    child.load_crate(path, self.volume, self.volume_path, MediaLibrary.root_crate.crate_name)
 
     for file in os.listdir(path):
       # If this crate has subdirectories, load the subcrates
