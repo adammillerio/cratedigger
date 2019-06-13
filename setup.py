@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 from setuptools import setup, find_packages
 
-# Load version from file
-with open('version', 'r') as version_file:
-  version = version_file.read().strip()
-
 setup(
   name='cratedigger',
-  version=version,
+  version='1.0.1',
   license='MIT',
   description='cratedigger is a command line tool for managing your Serato library',
   author='Adam Miller',
   author_email='miller@adammiller.io',
   url='https://github.com/adammillerio/cratedigger',
-  download_url='https://github.com/adammillerio/cratedigger/archive/v%s.tar.gz' % version,
+  download_url='https://github.com/adammillerio/cratedigger/archive/v1.0.1.tar.gz',
   keywords=['serato', 'dj', 'music', 'library', 'crate', 'sync'],
   classifiers=[
     'Development Status :: 5 - Production/Stable',
