@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 
 setup(
   name='cratedigger',
-  version='1.0.1',
+  version='1.0.2',
   license='MIT',
   description='cratedigger is a command line tool for managing your Serato library',
   author='Adam Miller',
   author_email='miller@adammiller.io',
   url='https://github.com/adammillerio/cratedigger',
-  download_url='https://github.com/adammillerio/cratedigger/archive/v1.0.1.tar.gz',
+  download_url='https://github.com/adammillerio/cratedigger/archive/v1.0.2.tar.gz',
   keywords=['serato', 'dj', 'music', 'library', 'crate', 'sync'],
   classifiers=[
     'Development Status :: 5 - Production/Stable',

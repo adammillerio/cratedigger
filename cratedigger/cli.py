@@ -39,7 +39,7 @@ class CrateDigger(click.MultiCommand):
     for filename in os.listdir(CrateDigger.command_folder):
       # Append each filename in the command folder to the list, without .py
       # e.g. sync for sync.py
-      if filename.endswith('.py'):
+      if filename != '__init__.py' and filename.endswith('.py'):
         commands.append(filename[:-3])
     
     # Return sorted list of all commands
