@@ -107,14 +107,9 @@ pass_context = click.make_pass_decorator(Context, ensure=True)
 @click.option('--dry-run', is_flag=True, help='Print all actions to console without applying')
 @pass_context
 def cli(ctx: Context, verbose: bool, dry_run: bool) -> None:
-  """Run the CrateDigger CLI.
+  """Cratedigger Serato library management tool
 
-  This is the entrypoint for the CrateDigger CLI, and initializes all
-  program-wide context values.
-
-  Args:
-    verbose (bool): Verbose output mode
-    dry_run (bool): Print actions to the console without performing them
+  cratedigger is a command line tool for managing your Serato library.
 
   """
 

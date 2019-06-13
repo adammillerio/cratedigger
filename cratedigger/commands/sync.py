@@ -17,10 +17,6 @@ def cli(ctx: Context, library_dir: str, serato_dir: str) -> None:
   It then writes the media crates to the Serato subcrates directory as .crate
   files.
 
-  Args:
-    library_dir (str): Path to the library to load media crates from
-    serato_dir (str, optional): Optional override path for the Serato library
-
   """
 
   logger.info('Loading media library from %s' % library_dir)
